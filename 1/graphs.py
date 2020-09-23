@@ -26,10 +26,16 @@ def graph_wf_vs_nf(numbers, weights, mw_averages=True):
 
     # M numbers
     if mw_averages:
-        for name, average_function in averages.items():
-            w = average_function(numbers, weights)
-            ax.plot([w, w], [0, y_max], linestyle='--', label=name)
+        if mw_averages is True:
+            for name, average_function in averages.items():
+                w = average_function(numbers, weights)
+                ax.plot([w, w], [0, y_max], linestyle='--', label=name)
+        else:
+            for name in mw_averages:
+                w = averages[name](numbers, weights)
+                ax.plot([w, w], [0, y_max], linestyle='--', label=name)
 
+    ax.set_xlabel('Molecular Weight')
     fig.legend()
 
     return fig, ax
@@ -61,7 +67,7 @@ def general_gaussian_wf_vs_nf(μ, σ, p):
     return graph_wf_vs_nf(numbers, weights)
 
 
-def flory_schulz_wf_vs_nf(a, k_max):
+def flory_schulz_wf_vs_nf(a, k_max, mw_averages=True):
     """
     Plot a Flory-Schulz distribution of weight factor vs number factor.
 
@@ -70,12 +76,12 @@ def flory_schulz_wf_vs_nf(a, k_max):
     """
     weights = np.arange(k_max)
     numbers = flory_schulz(a, weights)
-    return graph_wf_vs_nf(numbers, weights)
+    return graph_wf_vs_nf(numbers, weights, mw_averages)
 
 
 if __name__ == "__main__":
     # Flory-Schulz
-    fig, ax = flory_schulz_wf_vs_nf(0.05, 100)
+    fig, ax = flory_schulz_wf_vs_nf(0.05, 100, ['Mp', 'Mn', 'Mw', 'Mz'])
     ax.set_yticks(np.linspace(0, 0.02, 5))
 
-    plt.show()
+    fig.savefig('mw.svg')
